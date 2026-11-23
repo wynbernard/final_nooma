@@ -43,7 +43,7 @@ function respondUserCrud(bool $isAjax, bool $success, string $message, int $stat
         'type'    => $success ? 'success' : 'error',
         'message' => $message,
     ];
-    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? url('/frontend/Users/users.php')));
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? url('/frontend/UserManagement/UserManagement.php')));
     exit;
 }
 

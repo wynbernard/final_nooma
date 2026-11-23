@@ -226,14 +226,23 @@ include 'UserManagementModal.php'
 
                                         <td class="px-5 py-4">
                                             <div class="flex items-center justify-center gap-2">
-
-                                                <a
-                                                    href="edit.php?id=<?= urlencode((string)$user['user_id']) ?>"
-                                                    class="rounded-lg border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-50"
+                                                <button
+                                                    type="button"
+                                                    onclick='openEditUserModal(<?= json_encode(
+                                                        [
+                                                            "user_id" => $user["user_id"],
+                                                            "full_name" => $user["full_name"],
+                                                            "username" => $user["username"],
+                                                            "role" => $user["role"],
+                                                            "is_active" => $user["is_active"]
+                                                        ],
+                                                        JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+                                                    ) ?>)'
+                                                    class="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
                                                 >
+                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                     Edit
-                                                </a>
-
+                                                </button>
                                             </div>
                                         </td>
 

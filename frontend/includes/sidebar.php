@@ -44,16 +44,16 @@ function activeMenu(string $page): string
             Dashboard
         </a>
 
-        <a href="../Reservations/Reservations.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Reservations.php') ?>">
+        <a href="../Reservation/Reservation.php"
+            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Reservation.php') ?>">
             <span>▤</span>
             Reservations
         </a>
 
-        <a href="../Calendar/Calendar.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Calendar.php') ?>">
+        <a href="../ReservationTable/ReservationTable.php"
+            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('ReservationTable.php') ?>">
             <span>▣</span>
-            Calendar
+            Table Management
         </a>
 
         <a href="../Customers/Customers.php"

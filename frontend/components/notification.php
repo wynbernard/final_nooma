@@ -1,5 +1,5 @@
 <!-- Reusable Popup Notification Modal / Toast -->
-<div id="nooma-toast" class="fixed bottom-6 right-6 z-50 translate-y-20 opacity-0 transition-all duration-300 ease-out pointer-events-none">
+<div id="nooma-toast" class="fixed bottom-6 right-6 z-[110] translate-y-20 opacity-0 transition-all duration-300 ease-out pointer-events-none">
     <div id="nooma-toast-content" class="flex items-center gap-3 rounded-2xl border border-white/15 bg-navy-900/95 px-5 py-4 shadow-2xl shadow-black/70 backdrop-blur-md">
         <!-- Status Icon / Symbol -->
         <div id="nooma-toast-icon" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold">
@@ -66,3 +66,12 @@ function hideNotification() {
     toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
 }
 </script>
+
+<?php if (!empty($notificationMessage)): ?>
+<script>
+showNotification(
+    <?= json_encode((string) $notificationMessage, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
+    <?= json_encode(($notificationType ?? 'success') === 'error' ? 'error' : 'success') ?>
+);
+</script>
+<?php endif; ?>
