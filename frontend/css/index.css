@@ -1,0 +1,17 @@
+:focus-visible {
+  outline: 2px solid #e8b04a;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+::selection {
+  background: #e8b04a;
+  color: #050b1a;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  * {
+    transition: none !important;
+  }
+}
