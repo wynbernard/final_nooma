@@ -176,12 +176,14 @@ $monthYear = e($monthDate->format('F Y'));
                             </button>
                         </div>
                        <div class="flex shrink-0 items-center gap-2">
-                            <a id="asideAddReservationBtn"
-                            href="create.php?date=<?= e($initialDate) ?>"
-                            class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                            <button
+                                type="button"
+                                id="asideAddReservationBtn"
+                                data-date="<?= e($initialDate) ?>"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">
                                 <i class="fa-solid fa-plus"></i>
                                 Add Reservation
-                            </a>
+                            </button>
 
                             <a href="create.php"
                             class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
@@ -212,7 +214,9 @@ $monthYear = e($monthDate->format('F Y'));
             </div>
 
         </main>
-
+        <?php require_once __DIR__ . '/ReservationModal.php'; ?>
+        <?php require_once __DIR__ . '/EditReservationModal.php'; ?>
+        <?php require_once __DIR__ . '/DeleteReservationModal.php'; ?>
         <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
     </div>
@@ -223,11 +227,12 @@ $monthYear = e($monthDate->format('F Y'));
 <script>
     window.reservationCalendarData = {
         events: <?= $calendarJson ?>,
-        initialDate: <?= json_encode($initialDate) ?>
+        initialDate: <?= json_encode($initialDate) ?>,
+        activeTableCount: <?= json_encode(count($availableTables)) ?>
     };
 </script>
 
-<script src="../js/Reservation.js" defer></script>
+<script src="<?= e(url('/frontend/js/Reservation.js')) ?>" defer></script>
 
 <div
     id="reservationDetailsModal"

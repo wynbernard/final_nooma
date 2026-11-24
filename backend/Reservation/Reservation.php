@@ -48,7 +48,14 @@ function e($value): string
 // 4. CALENDAR DATE
 // =========================================================================
 
-$month = trim((string) ($_GET['month'] ?? date('Y-m')));
+$requestedDate = trim((string) ($_GET['date'] ?? ''));
+$requestedDateObject = DateTime::createFromFormat('!Y-m-d', $requestedDate);
+$requestedDateIsValid = $requestedDateObject instanceof DateTime
+    && $requestedDateObject->format('Y-m-d') === $requestedDate;
+
+$month = trim((string) ($_GET['month'] ?? (
+    $requestedDateIsValid ? $requestedDateObject->format('Y-m') : date('Y-m')
+)));
 
 if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
     $month = date('Y-m');
@@ -68,6 +75,9 @@ $monthStart = $monthDate->format('Y-m-01');
 $nextMonth = (clone $monthDate)
     ->modify('+1 month')
     ->format('Y-m-01');
+$availabilityEnd = (new DateTimeImmutable($nextMonth))
+    ->modify('+1 day')
+    ->format('Y-m-d');
 
 $nextMonthLink = (clone $monthDate)
     ->modify('+1 month')
@@ -93,6 +103,7 @@ $sql = "
         r.reservation_code,
         r.customer_id,
         c.full_name AS customer_name,
+        c.phone AS customer_phone,
         r.status_id,
         r.party_size,
         r.start_at,
@@ -120,7 +131,7 @@ $sql = "
         ON c.customer_id = r.customer_id
 
     WHERE r.start_at >= :month_start
-      AND r.start_at < :next_month
+      AND r.start_at < :availability_end
 
     ORDER BY r.start_at ASC
 ";
@@ -129,10 +140,22 @@ $stmt = $pdo->prepare($sql);
 
 $stmt->execute([
     ':month_start' => $monthStart,
-    ':next_month' => $nextMonth,
+    ':availability_end' => $availabilityEnd,
 ]);
 
 $reservations = $stmt->fetchAll();
+
+// =========================================================================
+// 5A. FETCH ACTIVE TABLES FOR RESERVATION ASSIGNMENT
+// =========================================================================
+
+$availableTablesStmt = $pdo->query("
+    SELECT table_id, table_number, table_name, capacity
+    FROM restaurant_tables
+    WHERE is_active = 1
+    ORDER BY area_id ASC, table_number ASC, table_id ASC
+");
+$availableTables = $availableTablesStmt->fetchAll();
 
 // =========================================================================
 // 5B. FETCH ASSIGNED RESERVATION TABLES
@@ -199,9 +222,14 @@ foreach ($reservations as $reservation) {
         'code' => $reservation['reservation_code'],
         'customer_id' => $reservation['customer_id'],
         'customer_name' => $reservation['customer_name'],
+        'reservation_code' => $reservation['reservation_code'],
+        'phone_number' => $reservation['customer_phone'],
+        'status_id' => (int) $reservation['status_id'],
         'guests' => (int) $reservation['party_size'],
         'start' => date('h:i A', $startTimestamp),
         'end' => date('h:i A', $endTimestamp),
+        'start_at' => date('Y-m-d H:i:s', $startTimestamp),
+        'end_at' => date('Y-m-d H:i:s', $endTimestamp),
         'status' => $reservation['status_name'],
         'occasion' => $reservation['occasion'],
         'special_requests' => $reservation['special_requests'],
@@ -218,14 +246,18 @@ foreach ($reservations as $reservation) {
 // 7. MONTHLY STATISTICS
 // =========================================================================
 
-$totalReservations = count($reservations);
+$monthlyReservations = array_values(array_filter(
+    $reservations,
+    static fn(array $reservation): bool => $reservation['start_at'] < $nextMonth
+));
+$totalReservations = count($monthlyReservations);
 
 $confirmedCount = 0;
 $pendingCount = 0;
 $cancelledCount = 0;
 $otherCount = 0;
 
-foreach ($reservations as $reservation) {
+foreach ($monthlyReservations as $reservation) {
     $status = strtolower(
         trim((string) $reservation['status_name'])
     );
@@ -264,4 +296,6 @@ $calendarJson = json_encode(
 );
 
 // Initial selected date
-$initialDate = (date('Y-m') === $month) ? $today : $monthStart;
+$initialDate = $requestedDateIsValid && $requestedDateObject->format('Y-m') === $month
+    ? $requestedDate
+    : ((date('Y-m') === $month) ? $today : $monthStart);
