@@ -3,7 +3,7 @@ body {
 }
 
 .calendar-day {
-  min-height: 88px;
+  min-height: clamp(64px, 6vw, 88px);
   border: 1px solid #e5e7eb;
   border-radius: 13px;
   background: #fff;
@@ -67,7 +67,7 @@ body {
 }
 
 .calendar-empty {
-  min-height: 88px;
+  min-height: clamp(64px, 6vw, 88px);
 }
 
 .booking-card {
@@ -92,7 +92,7 @@ body {
 @media (max-width: 640px) {
   .calendar-day,
   .calendar-empty {
-    min-height: 68px;
+    min-height: clamp(60px, 14vw, 72px);
     padding: 4px;
   }
 

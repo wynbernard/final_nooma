@@ -85,7 +85,7 @@ $monthYear = e($monthDate->format('F Y'));
             </div>
 
             <!-- CALENDAR AND BOOKINGS -->
-            <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
 
                 <!-- CALENDAR GRID -->
                 <section class="min-w-0 rounded-xl border border-slate-300 bg-white p-3 md:p-4">
@@ -165,10 +165,10 @@ $monthYear = e($monthDate->format('F Y'));
                 </section>
 
                 <!-- DAILY BOOKINGS PANEL -->
-                <aside class="flex min-h-[500px] flex-col rounded-xl border border-slate-300 bg-white">
+                <aside class="flex min-h-[400px] flex-col rounded-xl border border-slate-300 bg-white sm:min-h-[500px]">
 
                     <!-- PANEL HEADER -->
-                    <div class="flex items-center justify-between gap-3 border-b border-slate-100 p-4">
+                    <div class="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch 2xl:flex-row 2xl:items-center">
 
                        <div class="flex min-w-0 items-center gap-3">
                             <i class="fa-regular fa-calendar-check text-slate-700"></i>
@@ -182,7 +182,7 @@ $monthYear = e($monthDate->format('F Y'));
                                 Bookings for <?= e($initialDate) ?>
                             </button>
                         </div>
-                       <div class="flex shrink-0 items-center gap-2">
+                       <div class="flex shrink-0 flex-wrap items-center gap-2">
                             <button
                                 type="button"
                                 id="asideAddReservationBtn"
