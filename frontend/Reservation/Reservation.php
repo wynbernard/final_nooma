@@ -25,7 +25,7 @@ $monthYear = e($monthDate->format('F Y'));
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <link rel="stylesheet" href="../css/reservation.css">
+    <link rel="stylesheet" href="../css/Reservation.css">
 </head>
 
 <body class="min-h-screen text-slate-900">
@@ -85,18 +85,18 @@ $monthYear = e($monthDate->format('F Y'));
             </div>
 
             <!-- CALENDAR AND BOOKINGS -->
-            <div class="grid grid-cols-1 gap-5 2xl:grid-cols-3">
+            <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
 
                 <!-- CALENDAR GRID -->
-                <section class="min-w-0 rounded-xl border border-slate-300 bg-white p-4 md:p-5 2xl:col-span-2">
+                <section class="min-w-0 rounded-xl border border-slate-300 bg-white p-3 md:p-4">
 
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <h2 class="text-base font-semibold text-slate-900">
                             Calendar Grid
                         </h2>
                     </div>
 
-                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                    <div class="grid grid-cols-7 gap-1 sm:gap-1.5">
 
                         <!-- WEEKDAYS: SUNDAY FIRST -->
                         <?php foreach (

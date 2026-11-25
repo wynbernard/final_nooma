@@ -3,11 +3,11 @@ body {
 }
 
 .calendar-day {
-  min-height: 112px;
+  min-height: 88px;
   border: 1px solid #e5e7eb;
   border-radius: 13px;
   background: #fff;
-  padding: 9px;
+  padding: 7px;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -25,7 +25,7 @@ body {
 .calendar-day.selected {
   border: 2px solid #171717;
   background: #fafafa;
-  padding: 8px;
+  padding: 6px;
 }
 
 .calendar-day.today .day-number {
@@ -37,37 +37,37 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 27px;
-  height: 27px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .booking-count {
   display: block;
   margin-top: auto;
-  margin-bottom: 4px;
-  padding: 4px 7px;
+  margin-bottom: 2px;
+  padding: 3px 5px;
   border-radius: 5px;
   background: #f1f5f9;
   color: #334155;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
 }
 
 .availability-label {
   display: block;
-  padding: 4px 7px;
+  padding: 3px 5px;
   border-radius: 5px;
   background: #eafbf3;
   color: #047857;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
 }
 
 .calendar-empty {
-  min-height: 112px;
+  min-height: 88px;
 }
 
 .booking-card {
@@ -92,23 +92,23 @@ body {
 @media (max-width: 640px) {
   .calendar-day,
   .calendar-empty {
-    min-height: 85px;
-    padding: 6px;
+    min-height: 68px;
+    padding: 4px;
   }
 
   .calendar-day.selected {
-    padding: 5px;
+    padding: 3px;
   }
 
   .day-number {
-    width: 23px;
-    height: 23px;
+    width: 21px;
+    height: 21px;
     font-size: 11px;
   }
 
   .booking-count,
   .availability-label {
     font-size: 8px;
-    padding: 3px 4px;
+    padding: 2px 3px;
   }
 }
