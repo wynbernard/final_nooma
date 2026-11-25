@@ -2,6 +2,11 @@
 <?php
 require_once __DIR__ . '/../../backend/Reservation/Reservation.php';
 
+$reservationJsPath = __DIR__ . '/../js/Reservation.js';
+$reservationJsVersion = file_exists($reservationJsPath)
+    ? (string) filemtime($reservationJsPath)
+    : (string) time();
+
 $firstDaySunday = (int) $monthDate->format('w');
 $monthYear = e($monthDate->format('F Y'));
 ?>
@@ -13,6 +18,7 @@ $monthYear = e($monthDate->format('F Y'));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Reservations Calendar | NOOMA</title>
+    <link rel="icon" type="image/png" href="<?= e(url('/frontend/public/assets/image.png')) ?>">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -117,6 +123,7 @@ $monthYear = e($monthDate->format('F Y'));
                             $events = $calendarEvents[$dateKey] ?? [];
 
                             $isToday = $dateKey === $today;
+                            $isPastDate = $dateKey < $today;
                             $isInitial = $dateKey === $initialDate;
                             ?>
 
@@ -146,7 +153,7 @@ $monthYear = e($monthDate->format('F Y'));
 
                                 <!-- AVAILABILITY -->
                                 <span class="availability-label mt-auto">
-                                    Available
+                                    <?= $isPastDate ? 'Past date' : 'Available' ?>
                                 </span>
 
                             </button>
@@ -180,7 +187,8 @@ $monthYear = e($monthDate->format('F Y'));
                                 type="button"
                                 id="asideAddReservationBtn"
                                 data-date="<?= e($initialDate) ?>"
-                                class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                                <?= $initialDate < $today ? 'disabled title="Reservations cannot be added for past dates"' : '' ?>
+                                class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white <?= $initialDate < $today ? 'cursor-not-allowed bg-slate-400' : 'bg-slate-900 hover:bg-slate-800' ?>">
                                 <i class="fa-solid fa-plus"></i>
                                 Add Reservation
                             </button>
@@ -228,11 +236,12 @@ $monthYear = e($monthDate->format('F Y'));
     window.reservationCalendarData = {
         events: <?= $calendarJson ?>,
         initialDate: <?= json_encode($initialDate) ?>,
+        today: <?= json_encode($today) ?>,
         activeTableCount: <?= json_encode(count($availableTables)) ?>
     };
 </script>
 
-<script src="<?= e(url('/frontend/js/Reservation.js')) ?>" defer></script>
+<script src="<?= e(url('/frontend/js/Reservation.js')) ?>?v=<?= e($reservationJsVersion) ?>" defer></script>
 
 <div
     id="reservationDetailsModal"

@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../backend/ReservationTable/ReservationTable.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> | NOOMA</title>
+    <link rel="icon" type="image/png" href="<?= e(url('/frontend/public/assets/image.png')) ?>">
 
     <script src="https://cdn.tailwindcss.com"></script>
 

@@ -108,6 +108,8 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $reservationDate)) {
     [$y, $m, $d] = array_map('intval', explode('-', $reservationDate));
     if (!checkdate($m, $d, $y)) {
         $errors[] = 'Reservation date is not a valid calendar date.';
+    } elseif ($reservationDate < date('Y-m-d')) {
+        $errors[] = 'Reservations cannot be created for past dates.';
     }
 }
 

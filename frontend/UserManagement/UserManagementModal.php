@@ -31,7 +31,7 @@
         <!-- FORM -->
         <form
             id="userForm"
-            action="../../backend/UserManagement/UserManagement.php"
+            action="../../backend/UserManagement/UserManagementCreate.php"
             method="POST"
             autocomplete="off"
             class="flex-1 space-y-6 overflow-y-auto px-6 py-6"
@@ -75,7 +75,7 @@
                     >
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label for="username" class="mb-2 block text-sm font-semibold text-slate-700">
                             Username <span class="text-red-500">*</span>
@@ -86,21 +86,6 @@
                             name="username"
                             maxlength="50"
                             placeholder="Enter username"
-                            required
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
-                        >
-                    </div>
-
-                    <div>
-                        <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">
-                            Email Address <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            maxlength="150"
-                            placeholder="name@example.com"
                             required
                             class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
                         >
@@ -174,9 +159,10 @@
                         required
                         class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
                     >
-                        <option value="staff" selected>Staff</option>
-                        <option value="manager">Manager</option>
                         <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="cashier">Cashier</option>
+                        <option value="employee" selected>Employee</option>
                     </select>
                 </div>
 
@@ -251,7 +237,7 @@
         <!-- FORM -->
         <form
             id="editUserForm"
-            action="../../backend/UserManagement/UserManagement.php"
+            action="../../backend/UserManagement/UserManagementUpdate.php"
             method="POST"
             autocomplete="off"
             class="flex-1 space-y-6 overflow-y-auto px-6 py-6"
@@ -294,7 +280,7 @@
                     >
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label for="edit_username" class="mb-2 block text-sm font-semibold text-slate-700">
                             Username <span class="text-red-500">*</span>
@@ -306,21 +292,6 @@
                             maxlength="50"
                             required
                             placeholder="Enter username"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
-                        >
-                    </div>
-
-                    <div>
-                        <label for="edit_email" class="mb-2 block text-sm font-semibold text-slate-700">
-                            Email Address <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="edit_email"
-                            name="email"
-                            maxlength="150"
-                            required
-                            placeholder="name@example.com"
                             class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
                         >
                     </div>
@@ -387,9 +358,10 @@
                         required
                         class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
                     >
-                        <option value="staff">Staff</option>
-                        <option value="manager">Manager</option>
                         <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="cashier">Cashier</option>
+                        <option value="employee">Employee</option>
                     </select>
                 </div>
 
@@ -434,4 +406,78 @@
         </form>
     </div>
 </div>
-<script src="../../frontend/js/UserManagement.js" defer></script>
+
+<!-- DELETE USER MODAL -->
+<div
+    id="deleteUserModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="deleteUserModalTitle"
+>
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h2 id="deleteUserModalTitle" class="text-lg font-bold text-slate-800">Delete User</h2>
+                    <p class="mt-1 text-xs text-slate-500">This action cannot be undone.</p>
+                </div>
+            </div>
+            <button
+                type="button"
+                onclick="closeDeleteUserModal()"
+                class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Close modal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form
+            id="deleteUserForm"
+            action="<?= e(url('/backend/UserManagement/UserManagementDelete.php')) ?>"
+            method="POST"
+            class="space-y-5 p-6"
+        >
+            <input
+                type="hidden"
+                name="_csrf"
+                value="<?= htmlspecialchars((string) ($_SESSION['csrf'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+            >
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="user_id" id="delete_user_id">
+
+            <div
+                id="deleteUserFormMessage"
+                class="hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+            <p class="text-sm text-slate-600">
+                Permanently delete <span id="deleteUserName" class="font-bold text-slate-900">this user</span>?
+            </p>
+
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button
+                    type="button"
+                    onclick="closeDeleteUserModal()"
+                    class="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    id="deleteUserBtn"
+                    class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    <i class="fa-solid fa-trash-can"></i>
+                    Delete User
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

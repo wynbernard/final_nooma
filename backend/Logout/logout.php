@@ -65,6 +65,7 @@ session_destroy();
 
 // 6. Start a clean session with a fresh CSRF token for the logged-out visitor
 session_start([
+    'cookie_secure' => isHttpsRequest(),
     'cookie_httponly' => true,
     'cookie_samesite' => 'Lax',
     'use_strict_mode' => true,

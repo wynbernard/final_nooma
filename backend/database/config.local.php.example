@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+
+return [
+    'host' => 'localhost',
+    'database' => 'your_database_name',
+    'username' => 'your_database_username',
+    'password' => 'replace_with_your_database_password',
+    'port' => 3306,
+];

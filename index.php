@@ -57,7 +57,8 @@ $eyebrow  = 'inline-flex items-center gap-3 text-[11px] font-semibold uppercase 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#050b1a">
-    <title><?= e($site['name']) ?> | Bacolod City</title>
+    <title>NOOMA Kitchen + Bar | Bacolod City</title>
+    <link rel="icon" type="image/png" href="<?= e(url('/frontend/public/assets/image.png')) ?>">
     <meta name="description" content="<?= e($site['name']) ?> in Bacolod: dine-in and takeout, beef pares, crispy shrimp, cocktails. <?= e($site['price']) ?> per person.">
     <?php require __DIR__ . '/frontend/links/tailwind.php'; ?>
 </head>

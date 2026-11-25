@@ -1,13 +1,18 @@
 <?php
 include '../../backend/UserManagement/UserManagement.php';
-include 'UserManagementModal.php'
 ?>
+<?php
+$jsFile = __DIR__ . '/../js/UserManagement.js';
+$jsVersion = file_exists($jsFile) ? filemtime($jsFile) : time();
+?>
+<script src="<?= e(url('/frontend/js/UserManagement.js')) ?>?v=<?= e($jsVersion) ?>" defer></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($pageTitle) ?> | NOOMA</title>
+    <title>User Management | NOOMA</title>
+    <link rel="icon" type="image/png" href="<?= e(url('/frontend/public/assets/image.png')) ?>">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -136,7 +141,7 @@ include 'UserManagementModal.php'
 
                         <?php if ($search !== ''): ?>
                             <a
-                                href="users.php"
+                                href="UserManagement.php"
                                 class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                             >
                                 Clear
@@ -243,6 +248,25 @@ include 'UserManagementModal.php'
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                     Edit
                                                 </button>
+                                                <button
+                                                    type="button"
+                                                    onclick="toggleUserStatus(<?= (int) $user['user_id'] ?>, this)"
+                                                    class="inline-flex items-center gap-2 rounded-lg border border-amber-200 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50"
+                                                >
+                                                    <i class="fa-solid <?= $isActive ? 'fa-user-slash' : 'fa-user-check' ?>"></i>
+                                                    <?= $isActive ? 'Deactivate' : 'Activate' ?>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onclick='openDeleteUserModal(<?= (int) $user["user_id"] ?>, <?= json_encode(
+                                                        $user["full_name"],
+                                                        JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+                                                    ) ?>)'
+                                                    class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
+                                                >
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                    Delete
+                                                </button>
                                             </div>
                                         </td>
 
@@ -253,7 +277,7 @@ include 'UserManagementModal.php'
                             <?php else: ?>
 
                                 <tr>
-                                    <td colspan="9" class="px-5 py-12 text-center">
+                                    <td colspan="7" class="px-5 py-12 text-center">
 
                                         <div class="text-3xl">👥</div>
 
@@ -279,6 +303,8 @@ include 'UserManagementModal.php'
             </div>
 
         </main>
+
+        <?php include 'UserManagementModal.php'; ?>
 
         <!-- Footer -->
         <?php require_once __DIR__ . '/../includes/footer.php'; ?>

@@ -86,7 +86,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const activeTableCount = Number(calendarData.activeTableCount || 0);
     if (activeTableCount <= 0 || events.length === 0) return false;
 
-    for (let startMinutes = 660; startMinutes + 60 <= 1560; startMinutes += 30) {
+    for (
+      let startMinutes = 660;
+      startMinutes + 60 <= 1560;
+      startMinutes += 30
+    ) {
       const candidateStart = new Date(`${date}T00:00:00`);
       candidateStart.setMinutes(startMinutes);
       const candidateEnd = new Date(candidateStart.getTime() + 60 * 60 * 1000);
@@ -229,9 +233,12 @@ document.addEventListener("DOMContentLoaded", function () {
       day.classList.toggle("opacity-50", unavailable);
       const availabilityLabel = day.querySelector(".availability-label");
       if (availabilityLabel) {
-        availabilityLabel.textContent = unavailable
-          ? "Fully occupied"
-          : "Available";
+        const isPastDate = day.dataset.calendarDate < calendarData.today;
+        availabilityLabel.textContent = isPastDate
+          ? "Past date"
+          : unavailable
+            ? "Fully occupied"
+            : "Available";
       }
     });
 
@@ -257,6 +264,15 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     if (addReservationButton) {
       addReservationButton.dataset.date = date;
+      const isPastDate = date < calendarData.today;
+      addReservationButton.disabled = isPastDate;
+      addReservationButton.title = isPastDate
+        ? "Reservations cannot be added for past dates"
+        : "";
+      addReservationButton.classList.toggle("cursor-not-allowed", isPastDate);
+      addReservationButton.classList.toggle("bg-slate-400", isPastDate);
+      addReservationButton.classList.toggle("bg-slate-900", !isPastDate);
+      addReservationButton.classList.toggle("hover:bg-slate-800", !isPastDate);
     }
 
     // No reservations
@@ -825,6 +841,9 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("selectedDateLabel")?.dataset.date ||
       window.reservationCalendarData?.initialDate ||
       "";
+
+    const today = window.reservationCalendarData?.today;
+    if (activeDate && today && activeDate < today) return;
 
     if (dateInput && activeDate) {
       dateInput.value = activeDate;

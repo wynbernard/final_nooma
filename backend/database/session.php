@@ -1,12 +1,22 @@
 <?php
 declare(strict_types=1);
 
+if (!function_exists('isHttpsRequest')) {
+    function isHttpsRequest(): bool
+    {
+        return (
+            !empty($_SERVER['HTTPS']) &&
+            strtolower((string) $_SERVER['HTTPS']) !== 'off'
+        ) || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443;
+    }
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start([
+        'cookie_secure' => isHttpsRequest(),
         'cookie_httponly' => true,  // Prevents JS access to session cookie (XSS protection)
         'cookie_samesite' => 'Lax', // Mitigates CSRF
         'use_strict_mode' => true,  // Rejects uninitialized session IDs
-        // 'cookie_secure' => true, // Uncomment when running over HTTPS in production
     ]);
 }
 
@@ -33,7 +43,26 @@ if (!function_exists('e')) {
 if (!function_exists('url')) {
     function url(string $path = '/'): string
     {
-        $base = '/final_nooma';
-        return rtrim($base, '/') . '/' . ltrim($path, '/');
+        $base = getenv('APP_BASE_PATH');
+
+        if ($base === false) {
+            $base = '';
+            $documentRoot = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''));
+            $projectRoot = realpath(dirname(__DIR__, 2));
+
+            if ($documentRoot !== false && $projectRoot !== false) {
+                $documentRoot = rtrim(str_replace('\\', '/', $documentRoot), '/');
+                $projectRoot = rtrim(str_replace('\\', '/', $projectRoot), '/');
+
+                if (strcasecmp($projectRoot, $documentRoot) === 0) {
+                    $base = '';
+                } elseif (stripos($projectRoot, $documentRoot . '/') === 0) {
+                    $base = substr($projectRoot, strlen($documentRoot));
+                }
+            }
+        }
+
+        $base = trim(str_replace('\\', '/', $base), '/');
+        return ($base !== '' ? '/' . $base : '') . '/' . ltrim($path, '/');
     }
 }

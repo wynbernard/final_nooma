@@ -1,7 +1,17 @@
-
 <?php
 // Get current PHP filename
-$currentPage = basename($_SERVER['PHP_SELF']);
+$currentPage = basename((string) ($_SERVER['PHP_SELF'] ?? ''));
+
+// Resolve current user role safely from auth() or session
+$sidebarUser = function_exists('auth') ? auth() : ($_SESSION['user'] ?? null);
+$userRole = strtolower(trim((string) (
+    $sidebarUser['role']
+    ?? $_SESSION['role']
+    ?? ''
+)));
+
+// Roles allowed to access Management sections
+$canManageUsers = in_array($userRole, ['admin'], true);
 
 // Active menu styling
 function activeMenu(string $page): string
@@ -33,7 +43,7 @@ function activeMenu(string $page): string
     <!-- Navigation -->
     <nav class="sidebar-nav flex-1 space-y-2 overflow-y-auto px-4 py-6">
 
-        <!-- Main Menu -->
+        <!-- Main Menu (visible to cashier, manager, admin) -->
         <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
             Main Menu
         </p>
@@ -56,45 +66,18 @@ function activeMenu(string $page): string
             Table Management
         </a>
 
-        <a href="../Customers/Customers.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Customers.php') ?>">
-            <span>♙</span>
-            Customers
-        </a>
+        <!-- Management (hidden for cashier) -->
+        <?php if ($canManageUsers): ?>
+            <p class="mb-3 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Management
+            </p>
 
-        <!-- Management -->
-        <p class="mb-3 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Management
-        </p>
-
-        <a href="../Inventory/Inventory.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Inventory.php') ?>">
-            <span>▧</span>
-            Inventory
-        </a>
-
-        <a href="../UserManagement/UserManagement.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('UserManagement.php') ?>">
-            <span>♧</span>
-            Users Management
-        </a>
-
-        <a href="../Reports/Reports.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Reports.php') ?>">
-            <span>▥</span>
-            Reports
-        </a>
-
-        <!-- System -->
-        <p class="mb-3 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            System
-        </p>
-
-        <a href="../Settings/Settings.php"
-            class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('Settings.php') ?>">
-            <span>⚙</span>
-            Settings
-        </a>
+            <a href="../UserManagement/UserManagement.php"
+                class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition <?= activeMenu('UserManagement.php') ?>">
+                <span>♧</span>
+                Users Management
+            </a>
+        <?php endif; ?>
 
     </nav>
 
@@ -106,7 +89,7 @@ function activeMenu(string $page): string
             <input
                 type="hidden"
                 name="_csrf"
-                value="<?= htmlspecialchars((string) $_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                value="<?= htmlspecialchars((string) ($_SESSION['csrf'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
             <button type="submit"
                 class="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm text-red-300 transition hover:bg-red-500/10 hover:text-red-200">

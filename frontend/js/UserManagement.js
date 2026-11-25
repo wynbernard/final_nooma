@@ -36,9 +36,64 @@ function closeUserModal() {
 }
 
 // Close Create Modal when clicking outside
-userModal.addEventListener("click", function (event) {
+userModal?.addEventListener("click", function (event) {
   if (event.target === userModal) {
     closeUserModal();
+  }
+});
+
+// ADD MODAL
+userForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const msgBox = document.getElementById("userFormMessage");
+  const submitBtn = document.getElementById("saveUserBtn");
+  const formData = new FormData(userForm);
+  const endpoint =
+    userForm.getAttribute("action") ||
+    "../../backend/UserManagement/UserManagementCreate.php";
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (msgBox) {
+    msgBox.classList.add("hidden");
+    msgBox.textContent = "";
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        Accept: "application/json",
+      },
+    });
+
+    const rawText = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      throw new Error(
+        `Server returned non-JSON (HTTP ${response.status}). Check endpoint path or session.`,
+      );
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to create user.");
+    }
+
+    // Success: close modal, show notification, and refresh list/page
+    if (typeof closeUserModal === "function") closeUserModal();
+    window.location.reload();
+  } catch (err) {
+    if (msgBox) {
+      msgBox.textContent = err.message || "Error creating user.";
+      msgBox.classList.remove("hidden");
+    }
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });
 
@@ -51,140 +106,174 @@ const editUserForm = document.getElementById("editUserForm");
 const editUserFormMessage = document.getElementById("editUserFormMessage");
 const updateUserBtn = document.getElementById("updateUserBtn");
 
-// Open Edit Modal and populate fields
+// ==========================================
+// DELETE USER MODAL
+// ==========================================
+
+const deleteUserModal = document.getElementById("deleteUserModal");
+const deleteUserForm = document.getElementById("deleteUserForm");
+const deleteUserFormMessage = document.getElementById("deleteUserFormMessage");
+const deleteUserBtn = document.getElementById("deleteUserBtn");
+
+function openDeleteUserModal(userId, fullName) {
+  if (!deleteUserModal || !deleteUserForm) return;
+
+  deleteUserForm.reset();
+  document.getElementById("delete_user_id").value = userId;
+  document.getElementById("deleteUserName").textContent =
+    fullName || "this user";
+
+  if (deleteUserFormMessage) {
+    deleteUserFormMessage.textContent = "";
+    deleteUserFormMessage.classList.add("hidden");
+  }
+  if (deleteUserBtn) deleteUserBtn.disabled = false;
+
+  deleteUserModal.classList.remove("hidden");
+  deleteUserModal.classList.add("flex");
+  deleteUserBtn?.focus();
+}
+
+function closeDeleteUserModal() {
+  if (!deleteUserModal) return;
+
+  deleteUserModal.classList.add("hidden");
+  deleteUserModal.classList.remove("flex");
+  if (deleteUserFormMessage) {
+    deleteUserFormMessage.textContent = "";
+    deleteUserFormMessage.classList.add("hidden");
+  }
+}
+
+deleteUserModal?.addEventListener("click", function (event) {
+  if (event.target === deleteUserModal) closeDeleteUserModal();
+});
+
+deleteUserForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (deleteUserBtn) deleteUserBtn.disabled = true;
+  if (deleteUserFormMessage) {
+    deleteUserFormMessage.textContent = "";
+    deleteUserFormMessage.classList.add("hidden");
+  }
+
+  try {
+    const endpoint = deleteUserForm.getAttribute("action");
+    if (!endpoint) {
+      throw new Error("Delete endpoint is not configured.");
+    }
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: new FormData(deleteUserForm),
+      credentials: "same-origin",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        Accept: "application/json",
+      },
+    });
+
+    const rawText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      throw new Error(
+        `Server returned non-JSON (HTTP ${response.status}). Check endpoint path or session.`,
+      );
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to delete user.");
+    }
+
+    closeDeleteUserModal();
+    window.location.reload();
+  } catch (error) {
+    if (deleteUserFormMessage) {
+      deleteUserFormMessage.textContent =
+        error.message || "Error deleting user.";
+      deleteUserFormMessage.classList.remove("hidden");
+    }
+  } finally {
+    if (deleteUserBtn) deleteUserBtn.disabled = false;
+  }
+});
+
 function openEditUserModal(user) {
+  if (!editUserModal || !editUserForm || !user) return;
+
   editUserForm.reset();
-
-  editUserForm.querySelector('[name="action"]').value = "update";
-
   document.getElementById("edit_user_id").value = user.user_id;
-  document.getElementById("edit_full_name").value = user.full_name;
-  document.getElementById("edit_username").value = user.username;
-  document.getElementById("edit_role").value = user.role;
-
+  document.getElementById("edit_full_name").value = user.full_name || "";
+  document.getElementById("edit_username").value = user.username || "";
+  document.getElementById("edit_password").value = "";
+  const role = (user.role || "employee").toLowerCase();
+  document.getElementById("edit_role").value =
+    role === "staff" ? "employee" : role;
   document.getElementById("edit_is_active").checked =
     Number(user.is_active) === 1;
 
-  // Password is optional when editing
-  document.getElementById("edit_password").required = false;
-  document.getElementById("edit_password").value = "";
-
-  editUserFormMessage.textContent = "";
-  editUserFormMessage.classList.add("hidden");
-
-  updateUserBtn.disabled = false;
-  updateUserBtn.textContent = "Update User";
+  if (editUserFormMessage) {
+    editUserFormMessage.textContent = "";
+    editUserFormMessage.classList.add("hidden");
+  }
+  if (updateUserBtn) {
+    updateUserBtn.disabled = false;
+  }
 
   editUserModal.classList.remove("hidden");
   editUserModal.classList.add("flex");
-
   document.getElementById("edit_full_name").focus();
 }
 
-// Close Edit Modal
 function closeEditUserModal() {
+  if (!editUserModal) return;
   editUserModal.classList.add("hidden");
   editUserModal.classList.remove("flex");
 
-  editUserFormMessage.textContent = "";
-  editUserFormMessage.classList.add("hidden");
+  if (editUserFormMessage) {
+    editUserFormMessage.textContent = "";
+    editUserFormMessage.classList.add("hidden");
+  }
 }
 
-// Close Edit Modal when clicking outside
-editUserModal.addEventListener("click", function (event) {
+editUserModal?.addEventListener("click", function (event) {
   if (event.target === editUserModal) {
     closeEditUserModal();
   }
 });
 
-// ==========================================
-// ESCAPE KEY
-// ==========================================
-
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
-    if (!userModal.classList.contains("hidden")) {
-      closeUserModal();
-    }
-
-    if (!editUserModal.classList.contains("hidden")) {
-      closeEditUserModal();
-    }
+    if (!userModal?.classList.contains("hidden")) closeUserModal();
+    if (!editUserModal?.classList.contains("hidden")) closeEditUserModal();
+    if (!deleteUserModal?.classList.contains("hidden")) closeDeleteUserModal();
   }
 });
 
 // ==========================================
-// REUSABLE AJAX FORM SUBMISSION
+// SHARED MODAL HELPERS
 // ==========================================
 
-async function submitUserForm(form, button, messageElement, actionLabel) {
-  if (!form.reportValidity()) {
-    return;
+function togglePasswordVisibility(inputId, button) {
+  const input = document.getElementById(inputId);
+  const icon = button?.querySelector("i");
+  if (!input) return;
+
+  input.type = input.type === "password" ? "text" : "password";
+  if (icon) {
+    icon.classList.toggle("fa-eye");
+    icon.classList.toggle("fa-eye-slash");
   }
-
-  button.disabled = true;
-  button.textContent = actionLabel === "create" ? "Creating..." : "Updating...";
-
-  messageElement.textContent = "";
-  messageElement.classList.add("hidden");
-
-  try {
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: new FormData(form),
-      credentials: "same-origin",
-      headers: {
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-      },
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Unable to save user.");
-    }
-
-    showNotification(result.message || "User saved successfully.", "success");
-
-    // Close the appropriate modal
-    if (actionLabel === "create") {
-      closeUserModal();
-    } else {
-      closeEditUserModal();
-    }
-
-    // Refresh users table and statistics
-    window.setTimeout(() => window.location.reload(), 1200);
-  } catch (error) {
-    const message = error.message || "Something went wrong. Please try again.";
-    messageElement.textContent = message;
-
-    messageElement.classList.remove("hidden");
-    showNotification(message, "error");
-  } finally {
-    button.disabled = false;
-    button.textContent =
-      actionLabel === "create" ? "Create User" : "Update User";
-  }
+  button?.setAttribute(
+    "aria-label",
+    input.type === "password" ? "Show password" : "Hide password",
+  );
 }
 
-// ==========================================
-// CREATE FORM SUBMISSION
-// ==========================================
-
-userForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  submitUserForm(userForm, saveUserBtn, userFormMessage, "create");
-});
-
-// ==========================================
-// EDIT FORM SUBMISSION
-// ==========================================
-
-editUserForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  submitUserForm(editUserForm, updateUserBtn, editUserFormMessage, "update");
-});
+window.openEditUserModal = openEditUserModal;
+window.closeEditUserModal = closeEditUserModal;
+window.openDeleteUserModal = openDeleteUserModal;
+window.closeDeleteUserModal = closeDeleteUserModal;
+window.togglePasswordVisibility = togglePasswordVisibility;
