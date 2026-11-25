@@ -121,7 +121,7 @@ $pageTitle = "Dashboard";
     <div id="overlay"
         class="fixed inset-0 z-40 hidden bg-black/50 lg:hidden"></div>
 
-    <div class="min-h-screen lg:ml-64 flex flex-col">
+    <div class="page-layout min-h-screen lg:ml-64 flex flex-col">
 
         <?php include '../includes/navbar.php'; ?>
 

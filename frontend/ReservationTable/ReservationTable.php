@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../backend/ReservationTable/ReservationTable.php';
     <!-- Sidebar -->
     <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
-    <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
+    <div class="page-layout flex min-w-0 flex-1 flex-col lg:ml-64">
 
         <!-- Navbar -->
         <?php require_once __DIR__ . '/../includes/navbar.php'; ?>
